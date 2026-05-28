@@ -28,6 +28,7 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [copiedSeo, setCopiedSeo] = useState("");
   const [error, setError] = useState("");
+  const [darkMode, setDarkMode] = useState(true);
   const fileRef = useRef();
 
   const isCinto = category === "CINTO";
@@ -167,12 +168,12 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
 }`;
 
       const [descResp, seoResp] = await Promise.all([
-        fetch("/api/generate", {
+        fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ model: "claude-sonnet-4-20250514", max_tokens: 1000, messages })
         }),
-        fetch("/api/generate", {
+        fetch("https://api.anthropic.com/v1/messages", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -237,15 +238,45 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
     if (fileRef.current) fileRef.current.value = "";
   };
 
+  const t = {
+    bg: darkMode ? "#000000" : "#f5f5f5",
+    bgCard: darkMode ? "#111111" : "#ffffff",
+    bgInner: darkMode ? "#0a0a0a" : "#f9f9f9",
+    bgInput: darkMode ? "#1a1a1a" : "#ffffff",
+    border: darkMode ? "#222222" : "#e0e0e0",
+    borderInput: darkMode ? "#2e2e2e" : "#d0d0d0",
+    borderInner: darkMode ? "#2a2a2a" : "#e8e8e8",
+    text: darkMode ? "#ffffff" : "#111111",
+    textMuted: darkMode ? "#777777" : "#666666",
+    textFaint: darkMode ? "#444444" : "#aaaaaa",
+    headerBg: darkMode ? "#000000" : "#ffffff",
+    headerBorder: darkMode ? "#2a2a2a" : "#e0e0e0",
+    headerSub: darkMode ? "#666666" : "#999999",
+    btnSelected: darkMode ? "#ffffff" : "#111111",
+    btnSelectedText: darkMode ? "#000000" : "#ffffff",
+    btnUnselected: darkMode ? "rgba(255,255,255,0.03)" : "rgba(0,0,0,0.04)",
+    btnUnselectedText: darkMode ? "#aaaaaa" : "#555555",
+    btnBorder: darkMode ? "#333333" : "#d0d0d0",
+    tipsBg: darkMode ? "#0d0d0d" : "#f0f0f0",
+  };
+
   return (
-    <div style={{ minHeight: "100vh", background: "#000000", fontFamily: "'Georgia', 'Times New Roman', serif", color: "#ffffff", padding: "0" }}>
+    <div style={{ minHeight: "100vh", background: t.bg, fontFamily: "'Georgia', 'Times New Roman', serif", color: t.text, padding: "0", transition: "all 0.3s" }}>
       {/* Header */}
-      <div style={{ background: "#000000", borderBottom: "1px solid #2a2a2a", padding: "24px 40px", display: "flex", alignItems: "center", gap: "16px", boxShadow: "0 2px 12px rgba(255,255,255,0.04)" }}>
+      <div style={{ background: t.headerBg, borderBottom: `1px solid ${t.headerBorder}`, padding: "24px 40px", display: "flex", alignItems: "center", gap: "16px", boxShadow: darkMode ? "0 2px 12px rgba(255,255,255,0.04)" : "0 2px 12px rgba(0,0,0,0.06)" }}>
         <div style={{ fontSize: "32px" }}>👜</div>
-        <div>
-          <div style={{ fontSize: "22px", fontWeight: "bold", color: "#ffffff", letterSpacing: "2px", textTransform: "uppercase" }}>Gerador de Descrições</div>
-          <div style={{ fontSize: "12px", color: "#666666", letterSpacing: "3px", textTransform: "uppercase" }}>E-commerce Premium · Couro & Acessórios</div>
+        <div style={{ flex: 1 }}>
+          <div style={{ fontSize: "22px", fontWeight: "bold", color: t.text, letterSpacing: "2px", textTransform: "uppercase" }}>Gerador de Descrições</div>
+          <div style={{ fontSize: "12px", color: t.headerSub, letterSpacing: "3px", textTransform: "uppercase" }}>E-commerce Premium · Couro & Acessórios</div>
         </div>
+        <button onClick={() => setDarkMode(!darkMode)} style={{
+          display: "flex", alignItems: "center", gap: "8px", padding: "8px 16px",
+          borderRadius: "20px", cursor: "pointer", fontSize: "13px", fontFamily: "inherit",
+          background: darkMode ? "rgba(255,255,255,0.08)" : "rgba(0,0,0,0.06)",
+          border: `1px solid ${t.border}`, color: t.text, transition: "all 0.3s"
+        }}>
+          {darkMode ? "☀️ Tema Claro" : "🌙 Tema Escuro"}
+        </button>
       </div>
 
       <div style={{ maxWidth: "960px", margin: "0 auto", padding: "40px 24px", display: "grid", gridTemplateColumns: "1fr 1fr", gap: "32px" }}>
@@ -254,10 +285,10 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
         <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
 
           {/* Image */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>📷 Imagem do Produto</label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>📷 Imagem do Produto</label>
             <div onClick={() => fileRef.current.click()} style={{
-              border: "2px dashed #333333", borderRadius: "8px", padding: "20px", textAlign: "center", cursor: "pointer",
+              border: `2px dashed ${t.btnBorder}`, borderRadius: "8px", padding: "20px", textAlign: "center", cursor: "pointer",
               background: imagePreview ? "transparent" : "rgba(255,255,255,0.02)", transition: "all 0.2s",
               minHeight: "120px", display: "flex", alignItems: "center", justifyContent: "center", overflow: "hidden"
             }}>
@@ -265,8 +296,8 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
                 ? <img src={imagePreview} alt="preview" style={{ maxHeight: "140px", maxWidth: "100%", borderRadius: "6px", objectFit: "contain" }} />
                 : <div>
                     <div style={{ fontSize: "32px", marginBottom: "8px" }}>📁</div>
-                    <div style={{ color: "#aaaaaa", fontSize: "13px" }}>Clique para enviar imagem</div>
-                    <div style={{ color: "#555555", fontSize: "11px", marginTop: "4px" }}>JPG, PNG, WEBP</div>
+                    <div style={{ color: t.btnUnselectedText, fontSize: "13px" }}>Clique para enviar imagem</div>
+                    <div style={{ color: t.textMuted, fontSize: "11px", marginTop: "4px" }}>JPG, PNG, WEBP</div>
                   </div>
               }
             </div>
@@ -280,23 +311,23 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
           </div>
 
           {/* Title */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>📝 Título do Produto *</label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>📝 Título do Produto *</label>
             <input value={title} onChange={e => setTitle(e.target.value)}
               placeholder="Cole aqui o título do produto"
-              style={inputStyle} />
+              style={{ width: "100%", padding: "10px 14px", background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: "6px", color: t.text, fontFamily: "Georgia, serif", fontSize: "13px", boxSizing: "border-box", transition: "border-color 0.2s" }} />
           </div>
 
           {/* Category */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>🏷 Categoria *</label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>🏷 Categoria *</label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {CATEGORY_OPTIONS.map(cat => (
                 <button key={cat} onClick={() => setCategory(cat)} style={{
                   padding: "7px 14px", borderRadius: "20px", fontSize: "12px", cursor: "pointer",
                   border: category === cat ? "1px solid #ffffff" : "1px solid #333333",
-                  background: category === cat ? "#ffffff" : "rgba(255,255,255,0.03)",
-                  color: category === cat ? "#000000" : "#aaaaaa",
+                  background: category === cat ? t.btnSelected : t.btnUnselected,
+                  color: category === cat ? t.btnSelectedText : t.btnUnselectedText,
                   fontFamily: "inherit", fontWeight: category === cat ? "bold" : "normal",
                   transition: "all 0.15s"
                 }}>{cat}</button>
@@ -305,15 +336,15 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
           </div>
 
           {/* Bag Types */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>👜 Tipo de Bolsa <span style={{ color: "#555555", fontWeight: "normal", textTransform: "none", letterSpacing: 0 }}>(selecione um ou mais)</span></label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>👜 Tipo de Bolsa <span style={{ color: t.textMuted, fontWeight: "normal", textTransform: "none", letterSpacing: 0 }}>(selecione um ou mais)</span></label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
               {BAG_TYPES.map(type => (
                 <button key={type} onClick={() => toggleBagType(type)} style={{
                   padding: "7px 14px", borderRadius: "20px", fontSize: "12px", cursor: "pointer",
                   border: bagTypes.includes(type) ? "1px solid #ffffff" : "1px solid #333333",
-                  background: bagTypes.includes(type) ? "#ffffff" : "rgba(255,255,255,0.03)",
-                  color: bagTypes.includes(type) ? "#000000" : "#aaaaaa",
+                  background: bagTypes.includes(type) ? t.btnSelected : t.btnUnselected,
+                  color: bagTypes.includes(type) ? t.btnSelectedText : t.btnUnselectedText,
                   fontFamily: "inherit", fontWeight: bagTypes.includes(type) ? "bold" : "normal",
                   transition: "all 0.15s"
                 }}>{type}</button>
@@ -322,15 +353,15 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
           </div>
 
           {/* Material — multi-select */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>🧵 Material * <span style={{ color: "#555555", fontWeight: "normal", textTransform: "none", letterSpacing: 0 }}>(selecione um ou mais)</span></label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>🧵 Material * <span style={{ color: t.textMuted, fontWeight: "normal", textTransform: "none", letterSpacing: 0 }}>(selecione um ou mais)</span></label>
             <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "10px" }}>
               {MATERIAL_OPTIONS.map(mat => (
                 <button key={mat} onClick={() => toggleMaterial(mat)} style={{
                   padding: "7px 14px", borderRadius: "20px", fontSize: "12px", cursor: "pointer",
                   border: materials.includes(mat) ? "1px solid #ffffff" : "1px solid #333333",
-                  background: materials.includes(mat) ? "#ffffff" : "rgba(255,255,255,0.03)",
-                  color: materials.includes(mat) ? "#000000" : "#aaaaaa",
+                  background: materials.includes(mat) ? t.btnSelected : t.btnUnselected,
+                  color: materials.includes(mat) ? t.btnSelectedText : t.btnUnselectedText,
                   fontFamily: "inherit", fontWeight: materials.includes(mat) ? "bold" : "normal",
                   transition: "all 0.15s"
                 }}>{mat}</button>
@@ -338,33 +369,33 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
             </div>
             {materials.includes("OUTRO") && (
               <input value={customMaterial} onChange={e => setCustomMaterial(e.target.value)}
-                placeholder="Descreva o material..." style={{ ...inputStyle, marginTop: "4px" }} />
+                placeholder="Descreva o material..." style={{ width: "100%", background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: "6px", color: t.text, fontFamily: "Georgia, serif", fontSize: "13px", boxSizing: "border-box", transition: "border-color 0.2s", marginTop: "4px" }} />
             )}
           </div>
 
           {/* Dimensions */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>📏 Dimensões</label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>📏 Dimensões</label>
             {isCinto ? (
               <div>
-                <div style={{ fontSize: "12px", color: "#777777", marginBottom: "12px" }}>Tamanhos padrão aplicados automaticamente:</div>
+                <div style={{ fontSize: "12px", color: t.textMuted, marginBottom: "12px" }}>Tamanhos padrão aplicados automaticamente:</div>
                 <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
                   {Object.entries(BELT_SIZES).map(([size, cm]) => (
-                    <div key={size} style={{ padding: "8px 12px", borderRadius: "8px", border: "1px solid #333333", background: "rgba(255,255,255,0.04)", textAlign: "center", minWidth: "60px" }}>
-                      <div style={{ fontWeight: "bold", fontSize: "14px", color: "#ffffff" }}>{size}</div>
-                      <div style={{ fontSize: "10px", color: "#777777", marginTop: "2px" }}>{cm}</div>
+                    <div key={size} style={{ padding: "8px 12px", borderRadius: "8px", border: `1px solid ${t.btnBorder}`, background: "rgba(255,255,255,0.04)", textAlign: "center", minWidth: "60px" }}>
+                      <div style={{ fontWeight: "bold", fontSize: "14px", color: t.text }}>{size}</div>
+                      <div style={{ fontSize: "10px", color: t.textMuted, marginTop: "2px" }}>{cm}</div>
                     </div>
                   ))}
                 </div>
-                <div style={{ fontSize: "11px", color: "#555555", marginTop: "10px" }}>✓ Todos os tamanhos incluídos automaticamente na descrição</div>
+                <div style={{ fontSize: "11px", color: t.textMuted, marginTop: "10px" }}>✓ Todos os tamanhos incluídos automaticamente na descrição</div>
               </div>
             ) : (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: "10px" }}>
                 {[["Altura (cm)", altura, setAltura], ["Largura (cm)", largura, setLargura], ["Profundidade (cm)", profundidade, setProfundidade]].map(([lbl, val, setter]) => (
                   <div key={lbl}>
-                    <div style={{ fontSize: "11px", color: "#777777", marginBottom: "4px" }}>{lbl}</div>
+                    <div style={{ fontSize: "11px", color: t.textMuted, marginBottom: "4px" }}>{lbl}</div>
                     <input value={val} onChange={e => setter(e.target.value)} placeholder="0,0"
-                      style={{ ...inputStyle, padding: "8px 10px", fontSize: "14px", textAlign: "center" }} />
+                      style={{ width: "100%", background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: "6px", color: t.text, fontFamily: "Georgia, serif", fontSize: "13px", boxSizing: "border-box", transition: "border-color 0.2s", padding: "8px 10px", fontSize: "14px", textAlign: "center" }} />
                   </div>
                 ))}
               </div>
@@ -372,12 +403,12 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
           </div>
 
           {/* Observations */}
-          <div style={cardStyle}>
-            <label style={labelStyle}>💬 Alguma observação?</label>
+          <div style={{ background: t.bgCard, border: `1px solid ${t.border}`, borderRadius: "10px", padding: "18px" }}>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>💬 Alguma observação?</label>
             <textarea value={obs} onChange={e => setObs(e.target.value)}
               placeholder="Ex: possui bolso interno com zíper, alça removível, fecho magnético dourado..."
               rows={3}
-              style={{ ...inputStyle, resize: "vertical", lineHeight: "1.6" }} />
+              style={{ width: "100%", background: t.bgInput, border: `1px solid ${t.borderInput}`, borderRadius: "6px", color: t.text, fontFamily: "Georgia, serif", fontSize: "13px", boxSizing: "border-box", transition: "border-color 0.2s", resize: "vertical", lineHeight: "1.6" }} />
           </div>
 
           {/* Error */}
@@ -402,8 +433,8 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
             </button>
             <button onClick={handleClear} style={{
               padding: "14px 20px", borderRadius: "8px", cursor: "pointer",
-              background: "transparent", border: "1px solid #333333",
-              color: "#777777", fontFamily: "inherit", fontSize: "13px",
+              background: "transparent", border: `1px solid ${t.btnBorder}`,
+              color: t.textMuted, fontFamily: "inherit", fontSize: "13px",
               transition: "all 0.2s"
             }}>🗑 Limpar</button>
           </div>
@@ -413,7 +444,7 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
         <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
           <div style={{ ...cardStyle, flex: 1, display: "flex", flexDirection: "column" }}>
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "16px" }}>
-              <label style={labelStyle}>📄 Descrição Gerada</label>
+              <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>📄 Descrição Gerada</label>
               {result && (
                 <button onClick={handleCopy} style={{ display: "flex", alignItems: "center", gap: "5px", padding: "5px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "inherit", background: copied ? "rgba(60,200,80,0.15)" : "rgba(255,255,255,0.08)", border: copied ? "1px solid #40cc60" : "1px solid #555555", color: copied ? "#40cc60" : "#cccccc", transition: "all 0.2s" }}>
                   {copied ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>}
@@ -422,24 +453,24 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
               )}
             </div>
             {loading ? (
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", color: "#666666" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: "16px", color: t.headerSub }}>
                 <div style={{ fontSize: "40px", animation: "spin 1.5s linear infinite" }}>⚙️</div>
                 <div style={{ fontSize: "13px", letterSpacing: "1px" }}>Analisando produto e criando descrição...</div>
               </div>
             ) : result ? (
               <div style={{
-                flex: 1, background: "#0a0a0a", borderRadius: "8px", padding: "20px",
-                border: "1px solid #2a2a2a", fontSize: "13px", lineHeight: "1.85",
-                color: "#ffffff", whiteSpace: "pre-wrap", overflowY: "auto",
+                flex: 1, background: t.bgInner, borderRadius: "8px", padding: "20px",
+                border: `1px solid ${t.borderInner}`, fontSize: "13px", lineHeight: "1.85",
+                color: t.text, whiteSpace: "pre-wrap", overflowY: "auto",
                 maxHeight: "680px", fontFamily: "'Georgia', serif"
               }}>
                 {result}
               </div>
             ) : (
-              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: "#333333", gap: "12px", minHeight: "300px" }}>
+              <div style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", color: t.textFaint, gap: "12px", minHeight: "300px" }}>
                 <div style={{ fontSize: "48px", opacity: 0.25 }}>📝</div>
                 <div style={{ fontSize: "13px", textAlign: "center", lineHeight: "1.6" }}>
-                  Preencha os dados do produto<br />e clique em <strong style={{ color: "#666666" }}>Gerar Descrição</strong>
+                  Preencha os dados do produto<br />e clique em <strong style={{ color: t.headerSub }}>Gerar Descrição</strong>
                 </div>
               </div>
             )}
@@ -447,56 +478,56 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
 
           {/* SEO Box */}
           <div style={{ ...cardStyle, display: "flex", flexDirection: "column", gap: "14px" }}>
-            <label style={labelStyle}>🔍 SEO Gerado</label>
+            <label style={{ display: "block", fontSize: "11px", letterSpacing: "1.5px", textTransform: "uppercase", color: t.textMuted, marginBottom: "12px", fontFamily: "'Georgia', serif" }}>🔍 SEO Gerado</label>
             {loading ? (
-              <div style={{ textAlign: "center", color: "#555555", fontSize: "13px", padding: "20px 0" }}>
+              <div style={{ textAlign: "center", color: t.textMuted, fontSize: "13px", padding: "20px 0" }}>
                 <div style={{ fontSize: "24px", marginBottom: "8px" }}>⏳</div>
                 Gerando SEO...
               </div>
             ) : seoResult ? (
               <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
                 {/* Título SEO */}
-                <div style={{ background: "#0a0a0a", borderRadius: "8px", padding: "14px", border: "1px solid #2a2a2a" }}>
+                <div style={{ background: t.bgInner, borderRadius: "8px", padding: "14px", border: `1px solid ${t.borderInner}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <div style={{ fontSize: "11px", color: "#888888", letterSpacing: "1px", textTransform: "uppercase" }}>Título SEO</div>
+                    <div style={{ fontSize: "11px", color: t.textMuted, letterSpacing: "1px", textTransform: "uppercase" }}>Título SEO</div>
                     <button onClick={() => { copyText(seoResult.titulo, (v) => setCopiedSeo(v ? "titulo" : "")); }} title="Copiar" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "5px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "inherit", background: copiedSeo === "titulo" ? "rgba(60,200,80,0.15)" : "rgba(255,255,255,0.08)", border: copiedSeo === "titulo" ? "1px solid #40cc60" : "1px solid #555555", color: copiedSeo === "titulo" ? "#40cc60" : "#cccccc", transition: "all 0.2s" }}>
                       {copiedSeo === "titulo" ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>}
                       {copiedSeo === "titulo" ? "Copiado!" : "Copiar"}
                     </button>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
-                    <div style={{ fontSize: "13px", color: "#ffffff", lineHeight: "1.6", flex: 1 }}>{seoResult.titulo}</div>
+                    <div style={{ fontSize: "13px", color: t.text, lineHeight: "1.6", flex: 1 }}>{seoResult.titulo}</div>
                     <div style={{ fontSize: "11px", color: seoResult.titulo.length < 30 || seoResult.titulo.length > 65 ? "#ff7777" : "#40cc60", whiteSpace: "nowrap", marginTop: "2px" }}>{seoResult.titulo.length}/65</div>
                   </div>
                 </div>
                 {/* Palavras-chave */}
-                <div style={{ background: "#0a0a0a", borderRadius: "8px", padding: "14px", border: "1px solid #2a2a2a" }}>
+                <div style={{ background: t.bgInner, borderRadius: "8px", padding: "14px", border: `1px solid ${t.borderInner}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <div style={{ fontSize: "11px", color: "#888888", letterSpacing: "1px", textTransform: "uppercase" }}>Palavras-chave</div>
+                    <div style={{ fontSize: "11px", color: t.textMuted, letterSpacing: "1px", textTransform: "uppercase" }}>Palavras-chave</div>
                     <button onClick={() => { copyText(seoResult.palavras_chave, (v) => setCopiedSeo(v ? "kw" : "")); }} title="Copiar" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "5px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "inherit", background: copiedSeo === "kw" ? "rgba(60,200,80,0.15)" : "rgba(255,255,255,0.08)", border: copiedSeo === "kw" ? "1px solid #40cc60" : "1px solid #555555", color: copiedSeo === "kw" ? "#40cc60" : "#cccccc", transition: "all 0.2s" }}>
                       {copiedSeo === "kw" ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>}
                       {copiedSeo === "kw" ? "Copiado!" : "Copiar"}
                     </button>
                   </div>
-                  <div style={{ fontSize: "13px", color: "#ffffff", lineHeight: "1.8" }}>{seoResult.palavras_chave}</div>
+                  <div style={{ fontSize: "13px", color: t.text, lineHeight: "1.8" }}>{seoResult.palavras_chave}</div>
                 </div>
                 {/* Descrição SEO */}
-                <div style={{ background: "#0a0a0a", borderRadius: "8px", padding: "14px", border: "1px solid #2a2a2a" }}>
+                <div style={{ background: t.bgInner, borderRadius: "8px", padding: "14px", border: `1px solid ${t.borderInner}` }}>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "8px" }}>
-                    <div style={{ fontSize: "11px", color: "#888888", letterSpacing: "1px", textTransform: "uppercase" }}>Descrição SEO</div>
+                    <div style={{ fontSize: "11px", color: t.textMuted, letterSpacing: "1px", textTransform: "uppercase" }}>Descrição SEO</div>
                     <button onClick={() => { copyText(seoResult.descricao, (v) => setCopiedSeo(v ? "desc" : "")); }} title="Copiar" style={{ display: "flex", alignItems: "center", gap: "5px", padding: "5px 12px", borderRadius: "6px", cursor: "pointer", fontSize: "12px", fontFamily: "inherit", background: copiedSeo === "desc" ? "rgba(60,200,80,0.15)" : "rgba(255,255,255,0.08)", border: copiedSeo === "desc" ? "1px solid #40cc60" : "1px solid #555555", color: copiedSeo === "desc" ? "#40cc60" : "#cccccc", transition: "all 0.2s" }}>
                       {copiedSeo === "desc" ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg> : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>}
                       {copiedSeo === "desc" ? "Copiado!" : "Copiar"}
                     </button>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: "8px" }}>
-                    <div style={{ fontSize: "13px", color: "#ffffff", lineHeight: "1.6", flex: 1 }}>{seoResult.descricao}</div>
+                    <div style={{ fontSize: "13px", color: t.text, lineHeight: "1.6", flex: 1 }}>{seoResult.descricao}</div>
                     <div style={{ fontSize: "11px", color: seoResult.descricao.length < 120 || seoResult.descricao.length > 250 ? "#ff7777" : "#40cc60", whiteSpace: "nowrap", marginTop: "2px" }}>{seoResult.descricao.length}/250</div>
                   </div>
                 </div>
               </div>
             ) : (
-              <div style={{ textAlign: "center", color: "#333333", fontSize: "13px", padding: "20px 0" }}>
+              <div style={{ textAlign: "center", color: t.textFaint, fontSize: "13px", padding: "20px 0" }}>
                 <div style={{ fontSize: "32px", marginBottom: "8px", opacity: 0.3 }}>🔍</div>
                 O SEO será gerado junto com a descrição
               </div>
@@ -504,9 +535,9 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
           </div>
 
           {/* Tips */}
-          <div style={{ background: "#0d0d0d", border: "1px solid #222222", borderRadius: "8px", padding: "16px" }}>
-            <div style={{ fontSize: "11px", color: "#666666", letterSpacing: "1px", textTransform: "uppercase", marginBottom: "10px" }}>💡 Dicas de uso</div>
-            <div style={{ fontSize: "12px", color: "#555555", lineHeight: "1.8" }}>
+          <div style={{ background: t.tipsBg, border: `1px solid ${t.border}`, borderRadius: "8px", padding: "16px" }}>
+            <div style={{ fontSize: "11px", color: t.headerSub, letterSpacing: "1px", textTransform: "uppercase", marginBottom: "10px" }}>💡 Dicas de uso</div>
+            <div style={{ fontSize: "12px", color: t.textMuted, lineHeight: "1.8" }}>
               • Envie a imagem para descrições muito mais precisas<br />
               • Selecione todos os materiais presentes na peça<br />
               • Use o campo de observações para detalhes únicos<br />
@@ -528,35 +559,7 @@ Retorne APENAS um JSON válido, sem markdown, sem explicações, exatamente nest
   );
 }
 
-const cardStyle = {
-  background: "#111111",
-  border: "1px solid #222222",
-  borderRadius: "10px",
-  padding: "18px",
-};
-
-const labelStyle = {
-  display: "block",
-  fontSize: "11px",
-  letterSpacing: "1.5px",
-  textTransform: "uppercase",
-  color: "#777777",
-  marginBottom: "12px",
-  fontFamily: "'Georgia', serif"
-};
-
-const inputStyle = {
-  width: "100%",
-  padding: "10px 14px",
-  background: "#1a1a1a",
-  border: "1px solid #2e2e2e",
-  borderRadius: "6px",
-  color: "#ffffff",
-  fontFamily: "'Georgia', serif",
-  fontSize: "13px",
-  boxSizing: "border-box",
-  transition: "border-color 0.2s"
-};
+const cardStyle = {};
 
 const smallBtnStyle = {
   padding: "6px 14px",
